@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>نظام النشر</title>
+    <style>
+      body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+}
+button{
+  border: 2px dodgerblue solid;
+  background: none;
+  border-radius: 30px;
+}
+form {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+form label {
+  margin-top: 10px
+}
+
+form input, form textarea, form button {
+  margin-top: 5px;
+  padding: 5px;
+  font-size: 16px;
+}
+
+form input[type="file"] {
+  margin-top: 10px;
+  border: 2px dodgerblue solid;
+  background: white;
+  border-radius: 30px;
+  color: #fff;
+  width: 120px;
+}
+#post-list {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+.post {
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.post-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.post-content {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+    </style>
+  </head>
+  <body>
+    <h1>نظام النشر</h1>
+    <form id="post-form">
+      <label for="post-title">عنوان النشر</label>
+      <input type="text" id="post-title" name="post-title" required>
+      <label for="post-content">محتوى النشر</label>
+      <textarea id="post-content" name="post-content" required></textarea>
+      <label for="post-file">تحميل الملف</label>
+      <input type="file" id="post-file" name="post-file">
+      <button type="submit">نشر</button>
+    </form>
+    <div id="post-list"></div>
+    <script>
+      const postForm = document.querySelector('#post-form');
+const postList = document.querySelector('#post-list');
+
+postForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+
+  const postTitle = postForm.querySelector('#post-title').value;
+  const postContent = postForm.querySelector('#post-content').value;
+  const postFile = postForm.querySelector('#post-file').files[0];
+
+  const post = {
+    title: postTitle,
+    content: postContent,
+    file: postFile
+  };
+
+  let posts = JSON.parse(localStorage.getItem('posts')) || [];
+  posts.push(post);
+  localStorage.setItem('posts', JSON.stringify(posts));
+
+  postForm.reset();
+  displayPosts();
+});
+
+function displayPosts() {
+  let posts = JSON.parse(localStorage.getItem('posts')) || [];
+
+  postList.innerHTML = '';
+
+  posts.forEach((post) => {
+    const postElement = document.createElement('div');
+    postElement.classList.add('post');
+
+    const postTitleElement = document.createElement('div');
+    postTitleElement.classList.add('post-title');
+    postTitleElement.innerText = post.title;
+
+    const postContentElement = document.createElement('div');
+    postContentElement.classList.add('post-content');
+    postContentElement.innerText = post.content;
+
+    const postFileElement = document.createElement('div');
+    postFileElement.classList.add('post-file');
+
+    if (post.file) {
+      const fileUrl = URL.createObjectURL(post.file);
+      const fileLinkElement = document.createElement('a');
+      fileLinkElement.href = fileUrl;
+      fileLinkElement.innerText = post.file.name;
+      postFileElement.appendChild(fileLinkElement);
+    }
+
+    postElement.appendChild(postTitleElement);
+    postElement.appendChild(postContentElement);
+    postElement.appendChild(postFileElement);
+
+    postList.appendChild(postElement);
+  });
+}
+
+displayPosts();
+
+    </script>
+  </body>
+</html>
